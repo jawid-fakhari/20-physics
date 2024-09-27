@@ -52,10 +52,15 @@ const sphereBody = new CANNON.Body({
 world.addBody(sphereBody);
 
 //Floor
+//plane in cannon è infinito al contrario del three.js place
+//plane di default rivolta verso la camera, quindi necessità di cambiare l'angolo in base alla necessità
 const floorShape = new CANNON.Plane();
 const floorBody = new CANNON.Body();
-floorBody.mass = 0; //possiamo non scriverlo perche di default è 0
-floorBody.addShape(floorShape); //addShape, ci da possibilità di creare un Body composito da multipli shapes
+//possiamo non scriverlo perche di default è 0
+floorBody.mass = 0;
+//addShape, ci da possibilità di creare un Body composito da multipli shapes
+floorBody.addShape(floorShape);
+//cambiare l'angolo di cmaera con quaternion e setFromAxixAngle
 floorBody.quaternion.setFromAxisAngle(new CANNON.Vec3(-1, 0, 0), Math.PI * 0.5);
 world.addBody(floorBody);
 
