@@ -58,6 +58,10 @@ const environmentMapTexture = cubeTextureLoader.load([
  */
 //World
 const world = new CANNON.World();
+//Migliorare le prestazioni; SAPBroadphase testa i corpi su assi arbitrari durante più passaggi.
+world.broadphase = new CANNON.SAPBroadphase(world);
+//Anche se utilizziamo un algoritmo broadphase migliorato, tutti i Body vengono testati, anche quelli che non si muovono più. Possiamo usare una funzionalità chiamata sleep. con questa modalità quando il corpo è addormentato non verrà testato
+world.allowSleep = true;
 //dare gravità della terra al world
 world.gravity.set(0, -9.82, 0);
 
