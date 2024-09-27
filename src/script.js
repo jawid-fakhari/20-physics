@@ -66,6 +66,12 @@ const sphereBody = new CANNON.Body({
   material: defaultMaterial, //dedicare il plasticMaterial al sphere shape
 });
 
+//Applicare force a un oggetto
+sphereBody.applyLocalForce(
+  new CANNON.Vec3(150, 0, 0),
+  new CANNON.Vec3(0, 0, 0)
+);
+
 //aggiungere al world la geometria, poi physic world deve aggiornarsi in ogni frame (in animation funcion)
 world.addBody(sphereBody);
 
@@ -195,6 +201,9 @@ const tick = () => {
   //trovare delta time
   const deltaTime = elapsedTime - oldElapsedTime;
   oldElapsedTime = elapsedTime;
+
+  // Update physics world, qui potrebbe essere la forza del vento contrario del movimento del sphera
+  sphereBody.applyForce(new CANNON.Vec3(-0.5, 0, 0), sphereBody.position);
 
   //Update physics world .step(fps, deltaTime, numer of iterations)
   world.step(1 / 60, deltaTime, 3);
