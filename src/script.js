@@ -40,12 +40,31 @@ const world = new CANNON.World();
 //dare gravità della terra al world
 world.gravity.set(0, -9.82, 0);
 
+//**Materials, referenza dei materiali che useremo per contact material
+const concretMaterial = new CANNON.Material("concret");
+const plasticMaterial = new CANNON.Material("plastic");
+
+//**Contact Material che setta il comportamento del contatto di due materiali
+const concretPlaticContatctMaterial = new CANNON.ContactMaterial(
+  concretMaterial,
+  plasticMaterial,
+  {
+    friction: 0.1,
+    restitution: 0.7, //bouncing
+  }
+);
+
+//aggiungiamo al world, ma dobbiamo passare i materiali alle geometrie
+world.addContactMaterial(concretPlaticContatctMaterial);
+
+//Sphere shape
 //Creare geometria dando body con Cannon library
 const sphereShape = new CANNON.Sphere(0.5);
 const sphereBody = new CANNON.Body({
   mass: 1,
   position: new CANNON.Vec3(0, 3, 0),
   shape: sphereShape,
+  material: plasticMaterial, //dedicare il plasticMaterial al sphere shape
 });
 
 //aggiungere al world la geometria, poi physic world deve aggiornarsi in ogni frame (in animation funcion)
@@ -56,6 +75,8 @@ world.addBody(sphereBody);
 //plane di default rivolta verso la camera, quindi necessità di cambiare l'angolo in base alla necessità
 const floorShape = new CANNON.Plane();
 const floorBody = new CANNON.Body();
+//dedicare concretMaterial al floor
+floorBody.material = concretMaterial;
 //possiamo non scriverlo perche di default è 0
 floorBody.mass = 0;
 //addShape, ci da possibilità di creare un Body composito da multipli shapes
