@@ -221,6 +221,9 @@ const createSphere = (radius, position) => {
     material: defaultMaterial,
   });
   body.position.copy(position);
+
+  soundPlayer(body);
+
   world.addBody(body);
 
   //Salavare dentro objects To Update
@@ -249,14 +252,7 @@ const createBoxes = (width, height, depth, position) => {
   });
   body.position.copy(position);
 
-  //collide listener to play sound
-  body.addEventListener("collide", (e) => {
-    const impactForce = e.contact.getImpactVelocityAlongNormal();
-    if (impactForce > 2) {
-      collisionSound.currentTime = 0;
-      collisionSound.play();
-    }
-  });
+  soundPlayer(body);
 
   world.addBody(body);
 
@@ -264,6 +260,17 @@ const createBoxes = (width, height, depth, position) => {
   objectsToUpdate.push({
     mesh,
     body,
+  });
+};
+
+const soundPlayer = (body) => {
+  //collide listener to play sound
+  body.addEventListener("collide", (e) => {
+    const impactForce = e.contact.getImpactVelocityAlongNormal();
+    if (impactForce > 2) {
+      collisionSound.currentTime = 0;
+      collisionSound.play();
+    }
   });
 };
 
