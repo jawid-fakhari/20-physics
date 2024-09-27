@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import GUI from "lil-gui";
-import CANNON from "cannon";
+import CANNON, { Vec3 } from "cannon";
 
 /******************************************
  * Debug
@@ -9,6 +9,7 @@ import CANNON from "cannon";
 const gui = new GUI();
 const debugObject = {};
 
+//creare sfere
 debugObject.createSphere = () => {
   createSphere(Math.random() * 0.5, {
     x: (Math.random() - 0.5) * 3,
@@ -17,6 +18,16 @@ debugObject.createSphere = () => {
   });
 };
 gui.add(debugObject, "createSphere");
+
+//creare boxes
+debugObject.createBoxes = () => {
+  createBoxes(Math.random() * 0.5, Math.random() * 0.5, Math.random() * 0.5, {
+    x: (Math.random() - 0.5) * 3,
+    y: 3,
+    z: (Math.random() - 0.5) * 3,
+  });
+};
+gui.add(debugObject, "createBoxes");
 
 /********************************************
  * Base
@@ -171,18 +182,22 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 //oggetto che salva gli oggetti che necessitano aggiornamenti per physics animation
 const objectsToUpdate = [];
 
-//ottimizzare il codice
+//Geometries
 const sphereGeometry = new THREE.SphereGeometry(1, 20, 20);
-const sphereMaterial = new THREE.MeshStandardMaterial({
+const boxGeometry = new THREE.BoxGeometry(1, 1, 1);
+
+//Materials
+const meshMaterial = new THREE.MeshStandardMaterial({
   metalness: 0.3,
   roughness: 0.4,
   envMap: environmentMapTexture,
   envMapIntensity: 0.5,
 });
 
+// Sphere Maker function
 const createSphere = (radius, position) => {
   //Three.js mesh
-  const mesh = new THREE.Mesh(sphereGeometry, sphereMaterial);
+  const mesh = new THREE.Mesh(sphereGeometry, meshMaterial);
   mesh.scale.set(radius, radius, radius);
   mesh.castShadow = true;
   mesh.position.copy(position);
@@ -205,6 +220,34 @@ const createSphere = (radius, position) => {
     body,
   });
 };
+
+// Box Maker function
+const createBoxes = (width, height, depth, position) => {
+  //Three.js mesh
+  const mesh = new THREE.Mesh(boxGeometry, meshMaterial);
+  mesh.scale.set(width, height, depth);
+  mesh.castShadow = true;
+  mesh.position.copy(position);
+  scene.add(mesh);
+
+  //Cannon.js body
+  const shape = new CANNON.Box(new Vec3(width, height, depth)); //Box in CANNON.js ha bisgono di Vec3
+  const body = new CANNON.Body({
+    mass: 1,
+    position: new CANNON.Vec3(0, 3, 0),
+    shape,
+    material: defaultMaterial,
+  });
+  body.position.copy(position);
+  world.addBody(body);
+
+  //Salavare dentro objects To Update
+  objectsToUpdate.push({
+    mesh,
+    body,
+  });
+};
+
 //Chiamare la funzione e passare i parametri. qui al posto di Vetor3 oppure Vec3 possiamo passare object x y z, grazie a una funzionalità di CANNON.js
 //******Creato un lil-gui button per creare le sphere */
 // createSphere(0.5, { x: 0, y: 3, z: 0 });
@@ -227,6 +270,7 @@ const tick = () => {
 
   for (const object of objectsToUpdate) {
     object.mesh.position.copy(object.body.position);
+    object.mesh.quaternion.copy(object.body.quaternion);
   }
 
   // Update controls
