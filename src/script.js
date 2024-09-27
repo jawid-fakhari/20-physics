@@ -51,6 +51,14 @@ const sphereBody = new CANNON.Body({
 //aggiungere al world la geometria, poi physic world deve aggiornarsi in ogni frame (in animation funcion)
 world.addBody(sphereBody);
 
+//Floor
+const floorShape = new CANNON.Plane();
+const floorBody = new CANNON.Body();
+floorBody.mass = 0; //possiamo non scriverlo perche di default è 0
+floorBody.addShape(floorShape); //addShape, ci da possibilità di creare un Body composito da multipli shapes
+floorBody.quaternion.setFromAxisAngle(new CANNON.Vec3(-1, 0, 0), Math.PI * 0.5);
+world.addBody(floorBody);
+
 /******************************************
  * Test sphere
  */
